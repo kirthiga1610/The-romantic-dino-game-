@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Romantic Dino Proposal</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Arial', sans-serif;
+    }
+
+    body {
+      overflow: hidden;
+      background: linear-gradient(to bottom, #0f172a, #1e293b);
+    }
+
+    canvas {
+      display: block;
+      margin: auto;
+      background: linear-gradient(to bottom, #111827, #1f2937);
+      border-bottom: 5px solid white;
+    }
+
+    #score {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      color: white;
+      font-size: 28px;
+      font-weight: bold;
+      z-index: 5;
+    }
+
+    #messageBox {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      color: #ffc0cb;
+      font-size: 22px;
+      font-weight: bold;
+      z-index: 5;
+      max-width: 450px;
+      line-height: 1.5;
+    }
+
+    #popup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90%;
+      max-width: 700px;
+      background: rgba(255,255,255,0.98);
+      border-radius: 25px;
+      padding: 30px;
+      text-align: center;
+      z-index: 999;
+      box-shadow: 0 0 40px rgba(255, 105, 180, 0.7);
+      animation: popup 0.8s ease;
+    }
+
+    @keyframes popup {
+      from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.5);
+      }
+      to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+    }
+
+    #popup h1 {
+      color: #ff2d75;
+      margin-bottom: 15px;
+      font-size: 40px;
+    }
+
+    #popup p {
+      font-size: 20px;
+      color: #444;
+      margin-bottom: 15px;
+    }
+
+    .gallery {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .gallery img {
+      width: 150px;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 15px;
+      border: 3px solid pink;
+      transition: 0.4s;
+    }
+
+    .gallery img:hover {
+      transform: scale(1.05);
+    }
+
+    .btn {
+      padding: 15px 30px;
+      border: none;
+      border-radius: 50px;
+      font-size: 20px;
+      cursor: pointer;
+      margin: 10px;
+      transition: 0.3s;
+      font-weight: bold;
+    }
+
+    #yesBtn {
+      background: #ff2d75;
+      color: white;
+    }
+
+    #yesBtn:hover {
+      transform: scale(1.1);
+    }
+
+    #noBtn {
+      background: #d1d5db;
+      color: black;
+      position: relative;
+    }
+
+    #resultMessage {
+      margin-top: 25px;
+      font-size: 28px;
+      color: #ff2d75;
+      font-weight: bold;
+      line-height: 1.5;
+    }
+
+    .heart {
+      position: absolute;
+      color: pink;
+      font-size: 25px;
+      animation: fall linear forwards;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    @keyframes fall {
+      from {
+        transform: translateY(-100px);
+        opacity: 1;
+      }
+      to {
+        transform: translateY(900px);
+        opacity: 0;
+      }
+    }
+
+    #credits {
+      position: fixed;
+      bottom: 20px;
+      width: 100%;
+      text-align: center;
+      color: white;
+      font-size: 18px;
+      display: none;
+      z-index: 999;
+      animation: fadeIn 2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="score">Score: 0</div>
+<div id="messageBox">🦖 Kirthiii ❤️ Lokiiii Forever Story</div>
+
+<canvas id="gameCanvas" width="1100" height="450"></canvas>
+
+<!-- Replace photos with your own -->
+<div id="popup">
+  <h1>Lokiiii... Will You Be Mine Forever\? 🌹💖</h1>
+
+  <div class="gallery">
+    <img src="photo1.jpg" alt="photo">
+    <img src="photo2.jpg" alt="photo">
+    <img src="photo3.jpg" alt="photo">
+  </div>
+
+  <p>From every jump to every obstacle… I only wanted to reach you ❤️</p>
+
+  <button class="btn" id="yesBtn">YES 💍</button>
+  <button class="btn" id="noBtn">NO 😒</button>
+
+  <div id="resultMessage"></div>
+</div>
+
+<div id="credits">
+  🎬 Lead Dinosaur: Kirthiii 🦖 <br>
+  ❤️ Future Boyfriend: Lokiiii <br>
+  💍 To Be Continued... At Our Wedding
+</div>
+
+<!-- Replace with your romantic song -->
+<audio id="loveSong" src="song.mp3"></audio>
+
+<!-- Replace with your voice note -->
+<audio id="voiceNote" src="voice.mp3"></audio>
+
+<script>
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
+
+  let score = 0;
+  let gameOver = false;
+  let speed = 8;
+
+  const dino = {
+    x: 80,
+    y: 300,
+    width: 50,
+    height: 50,
+    velocityY: 0,
+    gravity: 0.9,
+    jumping: false
+  };
+
+  const obstacles = [];
+
+  function createObstacle() {
+    obstacles.push({
+      x: canvas.width,
+      y: 320,
+      width: 25,
+      height: 50
+    });
+  }
+
+  setInterval(() => {
+    if (!gameOver && score < 1902) {
+      createObstacle();
+    }
+  }, 1600);
+
+  function drawMoon() {
+    ctx.beginPath();
+    ctx.arc(980, 70, 35, 0, Math.PI * 2);
+    ctx.fillStyle = '#fef08a';
+    ctx.fill();
+  }
+
+  function drawStars() {
+    for (let i = 0; i < 80; i++) {
+      ctx.fillStyle = 'white';
+      ctx.fillRect(Math.random() * canvas.width, Math.random() * 180, 2, 2);
+    }
+  }
+
+  function drawGround() {
+    ctx.strokeStyle = 'white';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(0, 380);
+    ctx.lineTo(canvas.width, 380);
+    ctx.stroke();
+  }
+
+  function drawDino() {
+    ctx.font = '42px Arial';
+    ctx.fillText('🦖', dino.x, dino.y + 40);
+  }
+
+  function drawObstacles() {
+    ctx.font = '40px Arial';
+
+    obstacles.forEach(obstacle => {
+      ctx.fillText('🌵', obstacle.x, obstacle.y + 40);
+      obstacle.x -= speed;
+    });
+  }
+
+  function collision(obstacle) {
+    return (
+      dino.x < obstacle.x + obstacle.width &&
+      dino.x + dino.width > obstacle.x &&
+      dino.y < obstacle.y + obstacle.height &&
+      dino.y + dino.height > obstacle.y
+    );
+  }
+
+  function updateDialogue() {
+    const msg = document.getElementById('messageBox');
+
+    if (score >= 500 && score < 1000) {
+      msg.innerHTML = '💖 Lokiiii... you make my world brighter';
+    }
+
+    if (score >= 1000 && score < 1500) {
+      msg.innerHTML = '🦖 Still running toward you, Lokiiii';
+    }
+
+    if (score >= 1500 && score < 1902) {
+      msg.innerHTML = '❤️ Almost there, my Lokiiii...';
+    }
+  }
+
+  function createHeart() {
+    const heart = document.createElement('div');
+    heart.classList.add('heart');
+    heart.innerHTML = '💖';
+    heart.style.left = Math.random() * window.innerWidth + 'px';
+    heart.style.animationDuration = (Math.random() * 3 + 2) + 's';
+
+    document.body.appendChild(heart);
+
+    setTimeout(() => {
+      heart.remove();
+    }, 5000);
+  }
+
+  function startHeartRain() {
+    setInterval(createHeart, 120);
+  }
+
+  function update() {
+    if (gameOver) return;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    drawMoon();
+    drawStars();
+    drawGround();
+    drawDino();
+    drawObstacles();
+
+    dino.velocityY += dino.gravity;
+    dino.y += dino.velocityY;
+
+    if (dino.y >= 300) {
+      dino.y = 300;
+      dino.jumping = false;
+    }
+
+    obstacles.forEach((obstacle, index) => {
+      if (collision(obstacle)) {
+        realGameOver();
+      }
+
+      if (obstacle.x + obstacle.width < 0) {
+        obstacles.splice(index, 1);
+        score += 38;
+
+        if (score > 1902) {
+          score = 1902;
+        }
+
+        document.getElementById('score').innerHTML = 'Score: ' + score;
+        updateDialogue();
+
+        speed += 0.03;
+      }
+    });
+
+    if (score >= 1902) {
+      romanticEnding();
+      return;
+    }
+
+    requestAnimationFrame(update);
+  }
+
+  function jump() {
+    if (!dino.jumping) {
+      dino.velocityY = -16;
+      dino.jumping = true;
+    }
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.code === 'Space' || e.code === 'ArrowUp') {
+      jump();
+    }
+  });
+
+  document.addEventListener('click', jump);
+
+  function realGameOver() {
+    gameOver = true;
+
+    ctx.fillStyle = 'rgba(0,0,0,0.7)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.font = '55px Arial';
+    ctx.fillStyle = 'white';
+    ctx.fillText('GAME OVER 💔', 350, 180);
+
+    ctx.font = '30px Arial';
+    ctx.fillStyle = '#ffc0cb';
+    ctx.fillText('Lokiiii... you should have protected Kirthiii 🥺', 180, 250);
+
+    ctx.font = '24px Arial';
+    ctx.fillStyle = 'white';
+    ctx.fillText('Refresh the page and try again ❤️', 330, 320);
+  }
+
+  function romanticEnding() {
+    gameOver = true;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    drawMoon();
+
+    ctx.font = '70px Arial';
+    ctx.fillText('🦖', 320, 280);
+    ctx.fillText('🦕', 700, 280);
+    ctx.fillText('🌹', 540, 260);
+
+    ctx.font = '42px Arial';
+    ctx.fillStyle = 'pink';
+    ctx.fillText('1902 ❤️ LOVE UNLOCKED', 300, 120);
+
+    ctx.font = '28px Arial';
+    ctx.fillText('🦖 Kirthiii Dino finally found her Lokiiii 🌹', 250, 180);
+
+    startHeartRain();
+
+    document.getElementById('loveSong').play();
+
+    setTimeout(() => {
+      document.getElementById('popup').style.display = 'block';
+    }, 2500);
+  }
+
+  const noBtn = document.getElementById('noBtn');
+
+  const funnyTexts = [
+    'Nice Try 😂',
+    'System Error 😭',
+    'Only YES Allowed 😌',
+    'Illegal Move 🚫',
+    'Are You Sure? 🥺'
+  ];
+
+  noBtn.addEventListener('mouseover', () => {
+    noBtn.innerText = funnyTexts[Math.floor(Math.random() * funnyTexts.length)];
+
+    noBtn.style.position = 'absolute';
+    noBtn.style.left = Math.random() * 400 + 'px';
+    noBtn.style.top = Math.random() * 300 + 'px';
+
+    noBtn.style.transform = 'scale(' + (Math.random() * 0.5 + 0.6) + ')';
+  });
+
+  document.getElementById('yesBtn').addEventListener('click', () => {
+    document.getElementById('voiceNote').play();
+
+    document.getElementById('resultMessage').innerHTML = `
+      💍 Then y wait, Lokiiii... marry me soon ❤️ <br><br>
+      Mission Accepted: Kirthiii ❤️ Lokiiii Forever
+    `;
+
+    document.getElementById('credits').style.display = 'block';
+  });
+
+  update();
+</script>
+
+</body>
+</html>
