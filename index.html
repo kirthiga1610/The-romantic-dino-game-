@@ -202,10 +202,8 @@ Can we always be this close forever and ever? ❤️
 💍 To Be Continued... At Our Wedding
 </div>
 
-<!-- SONG -->
 <audio id="loveSong" src="song.mp3"></audio>
 
-<!-- VOICE NOTE -->
 <audio id="voiceNote" src="voice.mp3"></audio>
 
 <script>
@@ -217,7 +215,7 @@ let score=0;
 let gameOver=false;
 let speed=8;
 
-const FINAL_SCORE = 190225;
+const FINAL_SCORE=1902;
 
 const dino={
     x:80,
@@ -245,16 +243,21 @@ function createObstacle(){
 setInterval(()=>{
 
     if(!gameOver && score < FINAL_SCORE){
+
         createObstacle();
+
     }
 
-},1400);
+},1600);
 
 function drawMoon(){
 
     ctx.beginPath();
+
     ctx.arc(980,70,35,0,Math.PI*2);
+
     ctx.fillStyle='#fef08a';
+
     ctx.fill();
 
 }
@@ -331,19 +334,19 @@ function updateDialogue(){
 
     const msg=document.getElementById('messageBox');
 
-    if(score >= 50000 && score < 100000){
+    if(score >= 500 && score < 1000){
 
         msg.innerHTML='💖 Lokiiii... you make my world brighter';
 
     }
 
-    if(score >= 100000 && score < 150000){
+    if(score >= 1000 && score < 1500){
 
         msg.innerHTML='🦖 Still running toward you, Lokiiii';
 
     }
 
-    if(score >= 150000 && score < FINAL_SCORE){
+    if(score >= 1500 && score < FINAL_SCORE){
 
         msg.innerHTML='❤️ Almost there, my Lokiiii...';
 
@@ -419,7 +422,7 @@ function update(){
 
             obstacles.splice(index,1);
 
-            score += 225;
+            score += 38;
 
             if(score > FINAL_SCORE){
 
@@ -431,7 +434,7 @@ function update(){
 
             updateDialogue();
 
-            speed += 0.01;
+            speed += 0.03;
 
         }
 
@@ -529,7 +532,7 @@ function romanticEnding(){
 
     ctx.fillStyle='pink';
 
-    ctx.fillText('190225 ❤️ LOVE UNLOCKED',250,120);
+    ctx.fillText('1902 ❤️ LOVE UNLOCKED',280,120);
 
     ctx.font='28px Arial';
 
@@ -543,7 +546,7 @@ function romanticEnding(){
 
     const song=document.getElementById('loveSong');
 
-    // Increase volume slowly at final score
+    // Increase volume slowly
     function increaseVolume(){
 
         let volume=0.08;
@@ -559,6 +562,9 @@ function romanticEnding(){
             }else{
 
                 clearInterval(fade);
+
+                // SHOW POPUP AFTER FULL VOLUME
+                document.getElementById('popup').style.display='block';
 
             }
 
@@ -597,18 +603,17 @@ document.getElementById('yesBtn').addEventListener('click',()=>{
 
     const song=document.getElementById('loveSong');
 
-    // Jump to "You're my my my..." line
-    song.currentTime=125;
+    // STOP SONG COMPLETELY
+    song.volume=0;
 
-    // Full emotional volume
-    song.volume=1;
+    song.pause();
 
-    song.play();
+    // PLAY VOICE NOTE
+    const voice=document.getElementById('voiceNote');
 
-    document.getElementById('voiceNote').play();
+    voice.volume=1;
 
-    // SHOW PHOTOS ONLY AFTER YES
-    document.getElementById('popup').style.display='block';
+    voice.play();
 
     document.getElementById('resultMessage').innerHTML=`
     💍 Then y wait, Lokiiii... marry me soon ❤️ <br><br>
