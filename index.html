@@ -217,6 +217,8 @@ let score=0;
 let gameOver=false;
 let speed=8;
 
+const FINAL_SCORE = 190225;
+
 const dino={
     x:80,
     y:300,
@@ -242,11 +244,11 @@ function createObstacle(){
 
 setInterval(()=>{
 
-    if(!gameOver && score < 1902){
+    if(!gameOver && score < FINAL_SCORE){
         createObstacle();
     }
 
-},1600);
+},1400);
 
 function drawMoon(){
 
@@ -329,19 +331,19 @@ function updateDialogue(){
 
     const msg=document.getElementById('messageBox');
 
-    if(score >= 500 && score < 1000){
+    if(score >= 50000 && score < 100000){
 
         msg.innerHTML='💖 Lokiiii... you make my world brighter';
 
     }
 
-    if(score >= 1000 && score < 1500){
+    if(score >= 100000 && score < 150000){
 
         msg.innerHTML='🦖 Still running toward you, Lokiiii';
 
     }
 
-    if(score >= 1500 && score < 1902){
+    if(score >= 150000 && score < FINAL_SCORE){
 
         msg.innerHTML='❤️ Almost there, my Lokiiii...';
 
@@ -417,11 +419,11 @@ function update(){
 
             obstacles.splice(index,1);
 
-            score += 38;
+            score += 225;
 
-            if(score > 1902){
+            if(score > FINAL_SCORE){
 
-                score=1902;
+                score=FINAL_SCORE;
 
             }
 
@@ -429,13 +431,13 @@ function update(){
 
             updateDialogue();
 
-            speed += 0.03;
+            speed += 0.01;
 
         }
 
     });
 
-    if(score >= 1902){
+    if(score >= FINAL_SCORE){
 
         romanticEnding();
 
@@ -527,7 +529,7 @@ function romanticEnding(){
 
     ctx.fillStyle='pink';
 
-    ctx.fillText('1902 ❤️ LOVE UNLOCKED',280,120);
+    ctx.fillText('190225 ❤️ LOVE UNLOCKED',250,120);
 
     ctx.font='28px Arial';
 
@@ -541,12 +543,7 @@ function romanticEnding(){
 
     const song=document.getElementById('loveSong');
 
-    // Soft gameplay volume
-    song.volume=0.08;
-
-    song.play();
-
-    // Increase volume dramatically at proposal
+    // Increase volume slowly at final score
     function increaseVolume(){
 
         let volume=0.08;
@@ -570,12 +567,6 @@ function romanticEnding(){
     }
 
     increaseVolume();
-
-    setTimeout(()=>{
-
-        document.getElementById('popup').style.display='block';
-
-    },2500);
 
 }
 
@@ -607,7 +598,7 @@ document.getElementById('yesBtn').addEventListener('click',()=>{
     const song=document.getElementById('loveSong');
 
     // Jump to "You're my my my..." line
-    song.currentTime=2.05;
+    song.currentTime=125;
 
     // Full emotional volume
     song.volume=1;
@@ -615,6 +606,9 @@ document.getElementById('yesBtn').addEventListener('click',()=>{
     song.play();
 
     document.getElementById('voiceNote').play();
+
+    // SHOW PHOTOS ONLY AFTER YES
+    document.getElementById('popup').style.display='block';
 
     document.getElementById('resultMessage').innerHTML=`
     💍 Then y wait, Lokiiii... marry me soon ❤️ <br><br>
@@ -624,6 +618,13 @@ document.getElementById('yesBtn').addEventListener('click',()=>{
     document.getElementById('credits').style.display='block';
 
 });
+
+// SONG STARTS FROM BEGINNING OF GAME
+const bgSong=document.getElementById('loveSong');
+
+bgSong.volume=0.08;
+
+bgSong.play();
 
 update();
 
